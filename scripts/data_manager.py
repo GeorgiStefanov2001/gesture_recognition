@@ -120,13 +120,6 @@ class DataManager:
                             curr_data.append(y_coord)
 
                     # add the landmarks information for the current image to the aggregate list
-                    if len(curr_data) == 42:
-                        pass
-                        # mediapipe tracks 21 landmarks in a hand => * 2 because of x and y
-                        # if we don't have all points, don't use this data because
-                        # the aggregate data for training needs to be homogeneous
-                        # TODO: allow for training both hands
-
                     data.append(curr_data)  # create list of lists
                     labels.append(dir_name.split("/")[-1])
 
