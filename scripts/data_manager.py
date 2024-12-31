@@ -101,7 +101,7 @@ class DataManager:
                     # create a list of landmarks
                     curr_data = []
                     for landmarks in proccessed_img.multi_hand_landmarks:
-                        # print landmarks for debugging purposes
+                        # display landmarks for debugging purposes
                         if debug:
                             mp_drawing.draw_landmarks(
                                 img_rgb,
@@ -129,7 +129,6 @@ class DataManager:
         if debug:
             plt.show()
 
-        print(labels)
         # save the data list in a file
         proccessed_file_path = os.path.join(
             self.data_dir, f"data.{str(uuid.uuid1())}.pickle"
