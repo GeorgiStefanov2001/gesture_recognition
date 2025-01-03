@@ -79,11 +79,13 @@ class DataManager:
         hands = mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.3)
 
         print("Proccessing data...")
+
         top_dirs = (
             [data_dir]
             if data_dir != None
             else [dir[0] for dir in os.walk(self.collected_images_path)]
-        )  # 3-tuple, where first entry is dir name
+        ) # 3-tuple, where first entry is dir name
+
         for dir_name in top_dirs:
             images = glob.glob(
                 f"{os.path.join(self.collected_images_path, dir_name)}/*.jpg"
@@ -100,24 +102,23 @@ class DataManager:
                 if proccessed_img.multi_hand_landmarks:
                     # create a list of landmarks
                     curr_data = []
-                    for landmarks in proccessed_img.multi_hand_landmarks:
+                    for hand in proccessed_img.multi_hand_landmarks:
                         # display landmarks for debugging purposes
                         if debug:
                             mp_drawing.draw_landmarks(
                                 img_rgb,
-                                landmarks,
+                                hand,
                                 mp_hands.HAND_CONNECTIONS,
                                 mp_drawing_styles.get_default_hand_landmarks_style(),
                                 mp_drawing_styles.get_default_hand_connections_style(),
                             )
 
-                        for idx in range(len(landmarks.landmark)):
+                        for idx in range(len(hand.landmark)):
                             # each landmark in the hand landmarks has 3 values - x, y, z
-                            landmark_info = landmarks.landmark[idx]
-                            x_coord = landmark_info.x
-                            y_coord = landmark_info.y
-                            curr_data.append(x_coord)
-                            curr_data.append(y_coord)
+                            landmark_info = hand.landmark[idx]
+                            curr_data.append(landmark_info.x)
+                            curr_data.append(landmark_info.y)
+                            curr_data.append(landmark_info.z)
 
                     # add the landmarks information for the current image to the aggregate list
                     data.append(curr_data)  # create list of lists

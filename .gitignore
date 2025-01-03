@@ -1,5 +1,6 @@
 data/
 .DS-Store
+*.bkp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

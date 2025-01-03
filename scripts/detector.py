@@ -1,6 +1,6 @@
 import argparse
 
-from classifier import Classifier
+from classifier import HandClassifier
 from data_manager import DataManager
 
 parser = argparse.ArgumentParser(
@@ -21,7 +21,7 @@ mode = args.mode
 
 def run_detector():
     data_manager = DataManager()
-    classifier = Classifier()
+    classifier = HandClassifier()
 
     if mode == "collect-data":
         print(

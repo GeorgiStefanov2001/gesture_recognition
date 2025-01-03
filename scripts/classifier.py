@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 
-class Classifier:
+class HandClassifier:
     def train(self, data_file_path):
         """
         Train the classifier with the data it posseses.
@@ -20,7 +20,7 @@ class Classifier:
         print("Training model with latest data...")
 
         # pad data coming in
-        # this is needed in cases where mediapipe doesn't detect all 84 landmarks in both hands
+        # this is needed in cases where mediapipe doesn't detect all 42 landmarks in both hands
         data = data_dict["data"]
         max_len = max(len(sample) for sample in data)
         padded_data = [sample + [0] * (max_len - len(sample)) for sample in data]
@@ -72,31 +72,30 @@ class Classifier:
             if results.multi_hand_landmarks:
                 x_coords = []
                 y_coords = []
+                z_coords = []
 
-                for hand_landmarks in results.multi_hand_landmarks:
+                for hand in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(
                         frame,
-                        hand_landmarks,
+                        hand,
                         mp_hands.HAND_CONNECTIONS,  # hand connections
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style(),
                     )
 
-                for landmarks in results.multi_hand_landmarks:
-                    for idx in range(len(landmarks.landmark)):
+                    for idx in range(len(hand.landmark)):
                         # each landmark in the hand landmarks has 3 values - x, y, z
-                        landmark_info = landmarks.landmark[idx]
-                        x_coord = landmark_info.x
-                        y_coord = landmark_info.y
+                        landmark_info = hand.landmark[idx]
 
-                        x_coords.append(x_coord)
-                        y_coords.append(y_coord)
+                        x_coords.append(landmark_info.x)
+                        y_coords.append(landmark_info.y)
+                        z_coords.append(landmark_info.z)
 
-                # create data for prediction with x and y coords
-                curr_data = [item for pair in zip(x_coords, y_coords) for item in pair]
+                # create data for prediction with coords
+                curr_data = [item for pair in zip(x_coords, y_coords, z_coords) for item in pair]
 
-                # pad data to 84 since that is the max the model has been trained with
-                needed_padding_length = 84 - len(curr_data)
+                # pad data to 126 since that is the max the model has been trained with
+                needed_padding_length = 126 - len(curr_data)
                 padded_data = curr_data + [0] * needed_padding_length
                 prediction = model.predict([np.asarray(padded_data)])
                 predicted_label = prediction[0]
@@ -105,8 +104,8 @@ class Classifier:
                 x1 = int(min(x_coords) * W) - 10
                 y1 = int(min(y_coords) * H) - 10
 
-                x2 = int(max(x_coords) * W) - 10
-                y2 = int(max(y_coords) * H) - 10
+                x2 = int(max(x_coords) * W) + 10
+                y2 = int(max(y_coords) * H) + 10
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)
                 cv2.putText(
                     frame,
